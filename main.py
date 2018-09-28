@@ -27,10 +27,37 @@ class OrdersPrediction:
         try:
             self.csv = csv
             self.df = pd.read_csv(csv)
+        except IOError:
+            print('error occur while initialize OrdersPrediction: IOError')
         except:
             print('error occur while initialize OrdersPrediction')
 
-    def startPipeLine(self):
+    def __dataCollection(self):
+       pass
+
+    def __dataDescription(self):
+       pass
+
+    def __dataWrangling(self):
+       pass
+
+    def __dataVisualization(self):
+       pass
+
+    def __featureEngineering(self):
+       pass
+
+    def __modelBuilding(self):
         pass
 
-op = OrdersPrediction("test.csv")
+    def __modelDeployment(self):
+        pass
+
+    def startPipeLine(self):
+        """Entry point of start machine learning process"""
+        pass
+
+   
+
+# start ML pipeline
+OrdersPrediction("orderskus.csv").startPipeLine()
