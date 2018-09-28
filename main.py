@@ -1,5 +1,6 @@
 import pandas as pd
 import logging
+import csv
 
 class OrdersPrediction:
     """A simple class will implements the process of orders prediction according to date, delivery zone, order items."""
@@ -27,12 +28,14 @@ class OrdersPrediction:
         print("Summary Stats::" )
         print(self.df.describe())
         # self.__cleanup_column_names({'delivery_zone': 'dz'})
-
-    def __dataDescription(self):
-       pass
+        print(self.df.head(10))
 
     def __dataWrangling(self):
-       pass
+        # filtering data
+        self.df['delivery_date'] = pd.to_datetime(self.df.delivery_date, format='%Y-%m-%d', errors='coerce')
+        print(self.df.dtypes)
+        print("Number of rows::",self.df.shape[0])
+        print(self.df.head(100))
 
     def __dataVisualization(self):
        pass
@@ -50,6 +53,7 @@ class OrdersPrediction:
         """Entry point of start machine learning process"""
         try:
             self.__dataCollection()
+            self.__dataWrangling()
         except Exception as e:
             self.logger.error('error occur while running pipeline'+str(e))
 
