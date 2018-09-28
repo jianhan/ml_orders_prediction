@@ -36,6 +36,9 @@ class OrdersPrediction:
         print(self.df.dtypes)
         print("Number of rows::",self.df.shape[0])
         print(self.df.head(100))
+        print("Drop Rows with missing dates::" )
+        self.df = self.df.dropna(subset=['delivery_date'])
+        print("Shape::",self.df.shape)
 
     def __dataVisualization(self):
        pass
