@@ -10,10 +10,8 @@ class OrdersPrediction:
         try:
             self.csv = csv
             self.df = pd.read_csv(csv)
-        except IOError:
-            print('error occur while initialize OrdersPrediction: IOError')
-        except:
-            print('error occur while initialize OrdersPrediction')
+        except Exception as e:
+            self.logger.error('error occur while initialize OrdersPrediction'+str(e))
 
     def __dataCollection(self):
         print("Size: ", self.df.size)
@@ -28,6 +26,7 @@ class OrdersPrediction:
         print(self.df.info())
         print("Summary Stats::" )
         print(self.df.describe())
+        # self.__cleanup_column_names({'delivery_zone': 'dz'})
 
     def __dataDescription(self):
        pass
@@ -53,8 +52,20 @@ class OrdersPrediction:
             self.__dataCollection()
         except Exception as e:
             self.logger.error('error occur while running pipeline'+str(e))
-        pass
 
+    def __cleanup_column_names(self, rename_dict={},do_inplace=True):
+        """This function renames columns of a pandas dataframe
+            It converts column names to snake case if rename_dict is not passed.
+        Args:
+            rename_dict (dict): keys represent old column names and values point to newer ones
+            do_inplace (bool): flag to update existing dataframe or return a new one
+        Returns:
+            pandas dataframe if do_inplace is set to False, None otherwise
+        """
+        if not rename_dict:
+            return self.df.rename(columns={col: col.lower().replace(' ','_') for col in self.df.columns.values.tolist()}, inplace=do_inplace)
+        else:
+            return self.df.rename(columns=rename_dict,inplace=do_inplace)
 
 # start ML pipeline
 OrdersPrediction("orderskus.csv").startPipeLine()
