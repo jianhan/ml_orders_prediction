@@ -38,8 +38,11 @@ class OrdersPrediction:
         print(self.df.head(100))
         print("Drop Rows with missing dates::" )
         self.df = self.df.dropna(subset=['delivery_date'])
+        self.df = self.df.dropna(subset=['delivery_zone'])
+        self.df = self.df.dropna(subset=['sku'])
+        self.df = self.df.dropna(subset=['sum'])
         print("Shape::",self.df.shape)
-
+        print("Columns with Missing Values::", self.df.columns[self.df.isnull().any()].tolist())
     def __dataVisualization(self):
        pass
 
