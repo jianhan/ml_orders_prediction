@@ -1,6 +1,8 @@
 import pandas as pd
 import logging
-import csv
+
+import matplotlib.pyplot as plt
+import numpy as np
 
 class OrdersPrediction:
     """A simple class will implements the process of orders prediction according to date, delivery zone, order items."""
@@ -42,20 +44,35 @@ class OrdersPrediction:
         self.df = self.df.dropna(subset=['delivery_date'])
         self.df = self.df.dropna(subset=['delivery_zone'])
         self.df = self.df.dropna(subset=['sku'])
-        self.df = self.df.dropna(subset=['sum'])
+        self.df = self.df.dropna(subset=['purchased'])
         print("Shape::",self.df.shape)
         print("Columns with Missing Values::", self.df.columns[self.df.isnull().any()].tolist())
 
-        # handling categorical data
-        print(array_to_dict(self.df.delivery_zone.unique()))
+        # handling categorical data, delivery zone
         self.df['encoded_delivery_zone'] = self.df.delivery_zone.map(array_to_dict(self.df.delivery_zone.unique()))
+
+        # handling categorical data, skus
+        self.df['encoded_sku'] = self.df.sku.map(array_to_dict(self.df.sku.unique()))
+
         print(self.df.head())
-    
     def __dataVisualization(self):
-       pass
+        # print(self.df['purchased'][self.df['encoded_delivery_zone']==4].mean())
+        print(self.df.groupby(['sku'])['purchased'].sum())
+        print(self.df.groupby(['sku','purchased']).agg({'purchased':{'total_purchased':np.sum,
+                                                               'mean_price':np.mean,
+                                                               'variance_price':np.std,
+                                                               'count':np.count_nonzero},
+                                                               'purchased':np.sum}))
+
+        self.df[self.df.encoded_delivery_zone == 34][['purchased']].plot(style='blue')
+        plt.title('Price Trends for Particular User')
+        plt.xlabel("Bins")
+        plt.ylabel("# of Pixels")
+        plt.show()
+        
 
     def __featureEngineering(self):
-       pass
+        pass
 
     def __modelBuilding(self):
         pass
@@ -68,6 +85,7 @@ class OrdersPrediction:
         try:
             self.__dataCollection()
             self.__dataWrangling()
+            self.__dataVisualization()
         except Exception as e:
             self.logger.error('error occur while running pipeline'+str(e))
 
