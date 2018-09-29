@@ -28,14 +28,16 @@ class OrdersPrediction:
         print("Summary Stats::" )
         print(self.df.describe())
         # self.__cleanup_column_names({'delivery_zone': 'dz'})
-        print(self.df.head(10))
 
     def __dataWrangling(self):
-        # filtering data
+        # trim all
+        df_obj = self.df.select_dtypes(['object'])
+        self.df[df_obj.columns] = df_obj.apply(lambda x: x.str.strip())
+
+        # filtering data remove all missing values
         self.df['delivery_date'] = pd.to_datetime(self.df.delivery_date, format='%Y-%m-%d', errors='coerce')
         print(self.df.dtypes)
         print("Number of rows::",self.df.shape[0])
-        print(self.df.head(100))
         print("Drop Rows with missing dates::" )
         self.df = self.df.dropna(subset=['delivery_date'])
         self.df = self.df.dropna(subset=['delivery_zone'])
@@ -43,6 +45,9 @@ class OrdersPrediction:
         self.df = self.df.dropna(subset=['sum'])
         print("Shape::",self.df.shape)
         print("Columns with Missing Values::", self.df.columns[self.df.isnull().any()].tolist())
+
+        # handling categorical data
+        print(self.df.delivery_zone.unique())
     def __dataVisualization(self):
        pass
 
