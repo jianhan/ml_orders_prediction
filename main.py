@@ -37,6 +37,7 @@ class OrdersPrediction:
         # trim all
         df_obj = self.df.select_dtypes(['object'])
         self.df[df_obj.columns] = df_obj.apply(lambda x: x.str.strip())
+        self.df[df_obj.columns] = df_obj.apply(lambda x: x.str.lower())
 
         # filtering data remove all missing values
         self.df['delivery_date'] = pd.to_datetime(self.df.delivery_date, format='%Y-%m-%d', errors='coerce')
@@ -78,20 +79,15 @@ class OrdersPrediction:
         plt.title('Quantities Purchased according to delivery zone')
         plt.show()
 
-        # self.df.purchased.hist(color='yellow')
-        # plt.title('Purchased Distribution')
-        # plt.show()
-
-        self.df[['purchased', 'encoded_delivery_zone']].hist(by='encoded_delivery_zone', sharex=True)
+        # show histogram diagram for delivery zone and purchased
+        self.df[['purchased', 'delivery_zone']].hist(by='delivery_zone', sharex=True)
         plt.show()
 
-        # self.df[self.df.encoded_delivery_zone == 12].plot(x='delivery_date', y='purchased', style='blue')
-        # plt.title('Price Trends for Particular User')
-        # plt.show()
-
-        # x = np.linspace(0, 20, 100)
-        # plt.plot(x, np.sin(x))
-        # plt.show()
+        delivery_zone_series = self.df.groupby('delivery_zone').size()
+        delivery_zone_series.name = 'Delivery Zone Distribution'
+        delivery_zone_series.plot.pie(autopct='%.2f')
+        plt.title('Delivery Zone Share')
+        plt.show()
 
     def __featureEngineering(self):
         pass
