@@ -78,6 +78,13 @@ class OrdersPrediction:
         plt.title('Quantities Purchased according to delivery zone')
         plt.show()
 
+        # self.df.purchased.hist(color='yellow')
+        # plt.title('Purchased Distribution')
+        # plt.show()
+
+        self.df[['purchased', 'encoded_delivery_zone']].hist(by='encoded_delivery_zone', sharex=True)
+        plt.show()
+
         # self.df[self.df.encoded_delivery_zone == 12].plot(x='delivery_date', y='purchased', style='blue')
         # plt.title('Price Trends for Particular User')
         # plt.show()
