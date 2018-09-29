@@ -64,12 +64,13 @@ class OrdersPrediction:
                                                                'count':np.count_nonzero},
                                                                'purchased':np.sum}))
 
-        self.df[self.df.encoded_delivery_zone == 34][['purchased']].plot(style='blue')
+        self.df[self.df.encoded_delivery_zone == 4].plot(x='delivery_date', y='encoded_sku',style='blue')
         plt.title('Price Trends for Particular User')
-        plt.xlabel("Bins")
-        plt.ylabel("# of Pixels")
         plt.show()
         
+        # x = np.linspace(0, 20, 100)
+        # plt.plot(x, np.sin(x))
+        # plt.show()
 
     def __featureEngineering(self):
         pass
