@@ -61,7 +61,6 @@ class OrdersPrediction:
         print(self.df.sort_values(by=['delivery_date']))
 
     def __dataVisualization(self):
-        # print(self.df['purchased'][self.df['encoded_delivery_zone']==4].mean())
         print(self.df.groupby(['sku'])['purchased'].sum())
         print(self.df.groupby(['sku', 'purchased']).agg({'purchased': {'total_purchased': np.sum,
                                                                        'mean_price': np.mean,
@@ -69,13 +68,19 @@ class OrdersPrediction:
                                                                        'count': np.count_nonzero},
                                                          'purchased': np.sum}))
 
-        self.df[self.df.encoded_delivery_zone == 4].plot(x='delivery_date', y='purchased', style='blue')
-        plt.title('Price Trends for Particular User')
+        # show overall delivery date and purchased status
+        self.df.plot(x='delivery_date', y='purchased', style='blue')
+        plt.title('Sales status according to delivery date')
         plt.show()
 
-        self.df[self.df.encoded_delivery_zone == 12].plot(x='delivery_date', y='purchased', style='blue')
-        plt.title('Price Trends for Particular User')
+        # show overall delivery zone and purchased status
+        self.df[['delivery_zone', 'purchased']].groupby('delivery_zone').sum().plot.barh(color='orange')
+        plt.title('Quantities Purchased according to delivery zone')
         plt.show()
+
+        # self.df[self.df.encoded_delivery_zone == 12].plot(x='delivery_date', y='purchased', style='blue')
+        # plt.title('Price Trends for Particular User')
+        # plt.show()
 
         # x = np.linspace(0, 20, 100)
         # plt.plot(x, np.sin(x))
@@ -95,7 +100,7 @@ class OrdersPrediction:
         try:
             self.__dataCollection()
             self.__dataWrangling()
-            # self.__dataVisualization()
+            self.__dataVisualization()
         except Exception as e:
             self.logger.error('error occur while running pipeline' + str(e))
 
