@@ -1,8 +1,9 @@
-import pandas as pd
+import datetime
 import logging
 
 import matplotlib.pyplot as plt
 import numpy as np
+import pandas as pd
 
 
 class OrdersPrediction:
@@ -55,7 +56,9 @@ class OrdersPrediction:
         # handling categorical data, skus
         self.df['encoded_sku'] = self.df.sku.map(array_to_dict(self.df.sku.unique()))
 
-        print(self.df.head())
+        # filter invalid date
+        self.df = self.df[self.df['delivery_date'] <= datetime.datetime.now()]
+        print(self.df.sort_values(by=['delivery_date']))
 
     def __dataVisualization(self):
         # print(self.df['purchased'][self.df['encoded_delivery_zone']==4].mean())
@@ -92,7 +95,7 @@ class OrdersPrediction:
         try:
             self.__dataCollection()
             self.__dataWrangling()
-            self.__dataVisualization()
+            # self.__dataVisualization()
         except Exception as e:
             self.logger.error('error occur while running pipeline' + str(e))
 
