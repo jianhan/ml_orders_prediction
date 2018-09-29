@@ -47,7 +47,10 @@ class OrdersPrediction:
         print("Columns with Missing Values::", self.df.columns[self.df.isnull().any()].tolist())
 
         # handling categorical data
-        print(self.df.delivery_zone.unique())
+        print(array_to_dict(self.df.delivery_zone.unique()))
+        self.df['encoded_delivery_zone'] = self.df.delivery_zone.map(array_to_dict(self.df.delivery_zone.unique()))
+        print(self.df.head())
+    
     def __dataVisualization(self):
        pass
 
@@ -81,6 +84,15 @@ class OrdersPrediction:
             return self.df.rename(columns={col: col.lower().replace(' ','_') for col in self.df.columns.values.tolist()}, inplace=do_inplace)
         else:
             return self.df.rename(columns=rename_dict,inplace=do_inplace)
+
+
+def array_to_dict(arr):
+    arr.sort()
+    retVal = {}
+    for i in range(len(arr)):
+        retVal[arr[i]] = i
+    return retVal
+    
 
 # start ML pipeline
 OrdersPrediction("orderskus.csv").startPipeLine()
