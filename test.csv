@@ -1,0 +1,6 @@
+"shop_id","delivery_zone","delivery_date","sku","purchased"
+1,"Adelaide","2018-09-01","WYF004",1
+1,"Brisbane Metro","2018-09-01","YF538",1
+2,"Brisbane Northside","2018-09-01","YF533",2
+2,"Gold Coast","2018-09-01","YF562",2
+2,"Gold Coast","2018-09-01","YF562",3

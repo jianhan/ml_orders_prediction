@@ -48,7 +48,6 @@ class OrdersPrediction:
         self.df = self.df.dropna(subset=['delivery_zone'])
         self.df = self.df.dropna(subset=['sku'])
         self.df = self.df.dropna(subset=['purchased'])
-        print("Shape::", self.df.shape)
         print("Columns with Missing Values::", self.df.columns[self.df.isnull().any()].tolist())
 
         # handling categorical data, delivery zone
@@ -59,7 +58,16 @@ class OrdersPrediction:
 
         # filter invalid date
         self.df = self.df[self.df['delivery_date'] <= datetime.datetime.now()]
-        print(self.df.sort_values(by=['delivery_date']))
+
+        # drop duplicates
+        self.df = self.df.drop_duplicates()
+
+        # generate unique id, following code only required for auto featuring engineering, not applicable at the
+        # moment
+        # self.df['id'] = np.arange(self.df.shape[0])
+
+        print("Shape--::", self.df.shape)
+        print("Sample--::", self.df.head(100))
 
     def __dataVisualization(self):
         print(self.df.groupby(['sku'])['purchased'].sum())
@@ -90,7 +98,38 @@ class OrdersPrediction:
         plt.show()
 
     def __featureEngineering(self):
-        self.df['id'] = self.df['shop_id'] + self.df['encoded_delivery_zone'] + self.df['encoded_sku']
+        # Following is a demo of auto featuring, which is not applicable in this case, it is useful when we have
+        # multiply tables and join relations, etc... , current data set is too simple and could not get much benifit out of it
+
+        # es = ft.EntitySet(id='sales')
+        # es.entity_from_dataframe(entity_id='youfoodz_sales', dataframe=self.df, index='id')
+        # feature_matrix, features_defs = ft.dfs(entityset=es, target_entity="youfoodz_sales")
+        # print(feature_matrix.head(5))
+
+        # added day month year
+        self.df['delivery_year'] = self.df['delivery_date'].map(lambda x: x.year)
+        self.df['delivery_month'] = self.df['delivery_date'].map(lambda x: x.month)
+        self.df['delivery_day'] = self.df['delivery_date'].map(lambda x: x.day)
+
+        # added total purchased per shop
+        self.df['total_purchased_per_shop'] = self.df['purchased'].groupby(self.df['shop_id']).transform('sum')
+
+        # get average purchased according to delivery date
+        self.df['purchase_average_by_delivery_date'] = self.df.groupby('delivery_date')['purchased'].transform(
+            lambda x: x.mean()
+        )
+
+        # get average purchased according to delivery date and sku
+        self.df['purchase_average_by_delivery_date_sku'] = self.df.groupby(['delivery_date', 'sku'])[
+            'purchased'].transform(
+            lambda x: x.mean()
+        )
+
+        # get average purchased according to delivery date and sku and shop id
+        self.df['purchase_average_by_delivery_date_sku_shop_id'] = self.df.groupby(['delivery_date', 'sku', 'shop_id'])[
+            'purchased'].transform(
+            lambda x: x.mean()
+        )
 
     def __modelBuilding(self):
         pass
@@ -103,8 +142,8 @@ class OrdersPrediction:
         try:
             self.__dataCollection()
             self.__dataWrangling()
-            # self.__dataVisualization()
             self.__featureEngineering()
+            # self.__dataVisualization()
         except Exception as e:
             self.logger.error('error occur while running pipeline' + str(e))
 
@@ -135,3 +174,4 @@ def array_to_dict(arr):
 
 # start ML pipeline
 OrdersPrediction("orderskus.csv").startPipeLine()
+# OrdersPrediction("test.csv").startPipeLine()
