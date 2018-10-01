@@ -1,9 +1,16 @@
 import datetime
 import logging
+import warnings
 
 import numpy as np
 import pandas as pd
+
+warnings.filterwarnings(action="ignore", module="scipy", message="^internal gelsd")
 from sklearn.linear_model import LinearRegression
+from sklearn.linear_model import Lasso
+from sklearn.linear_model import BayesianRidge
+
+from sklearn.preprocessing import StandardScaler
 
 pd.options.mode.chained_assignment = None  # default='warn'
 import matplotlib.pyplot as plt
@@ -155,7 +162,7 @@ class OrdersPrediction:
         self.__dataCollection()
         self.__dataWrangling()
         self.__featureEngineering()
-        # self.__dataVisualization()
+        self.__dataVisualization()
         # print(self.df.columns)
         # split training features and output labels
         outcome_label = self.df['purchased']
@@ -170,20 +177,30 @@ class OrdersPrediction:
         X_train, X_test, y_train, y_test = train_test_split(training_features, outcome_label,
                                                             test_size=0.33,
                                                             random_state=42)
-        self.__linerRegression(X_train, X_test, y_train, y_test)
+        sc = StandardScaler()
+        X_train_std = sc.fit_transform(X_train)
+        X_test_std = sc.transform(X_test)
+        self.__linerRegression(X_train_std, X_test_std, y_train, y_test)
+        self.__lasso(X_train_std, X_test_std, y_train, y_test)
+        self.__bayesian_ridge_regression(X_train_std, X_test_std, y_train, y_test)
+        # except Exception as e:
         # except Exception as e:
         #     self.logger.error('error occur while running pipeline::' + str(e))
 
     def __linerRegression(self, X_train, X_test, y_train, y_test):
         lm = LinearRegression()
         lm.fit(X_train, y_train)
+        print('Liner Regression Accuracy:', lm.score(X_test, y_test))
 
-        pred_train = lm.predict(X_train)
-        pred_test = lm.predict(X_test)
+    def __lasso(self, X_train, X_test, y_train, y_test):
+        lm = Lasso(alpha=0.1)
+        lm.fit(X_train, y_train)
+        print('Lasso Accuracy:', lm.score(X_test, y_test))
 
-        print('Accuracy:', lm.score(X_test, y_test))
-        # print('Classification Stats:')
-        # print(classification_report(y_test, pred))
+    def __bayesian_ridge_regression(self, X_train, X_test, y_train, y_test):
+        lm = BayesianRidge()
+        lm.fit(X_train, y_train)
+        print('BayesianRidge Accuracy:', lm.score(X_test, y_test))
 
     def __cleanup_column_names(self, rename_dict={}, do_inplace=True):
         """This function renames columns of a pandas dataframe
