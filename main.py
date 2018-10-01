@@ -131,6 +131,9 @@ class OrdersPrediction:
             lambda x: x.mean()
         )
 
+        # log transformation
+        self.df['purchased_og'] = np.log((1 + self.df['purchased']))
+
     def __modelBuilding(self):
         pass
 
