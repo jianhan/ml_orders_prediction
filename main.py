@@ -1,9 +1,15 @@
 import datetime
 import logging
 
-import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
+from sklearn.linear_model import LinearRegression
+
+pd.options.mode.chained_assignment = None  # default='warn'
+import matplotlib.pyplot as plt
+from sklearn.model_selection import train_test_split
+
+pd.options.mode.chained_assignment = None  # default='warn'
 
 
 class OrdersPrediction:
@@ -140,15 +146,44 @@ class OrdersPrediction:
     def __modelDeployment(self):
         pass
 
+    def __splitDataset(self, df, outcome_labels):
+        pass
+
     def startPipeLine(self):
         """Entry point of start machine learning process"""
-        try:
-            self.__dataCollection()
-            self.__dataWrangling()
-            self.__featureEngineering()
-            # self.__dataVisualization()
-        except Exception as e:
-            self.logger.error('error occur while running pipeline' + str(e))
+        # try:
+        self.__dataCollection()
+        self.__dataWrangling()
+        self.__featureEngineering()
+        # self.__dataVisualization()
+        # print(self.df.columns)
+        # split training features and output labels
+        outcome_label = self.df['purchased']
+
+        feature_names = ['shop_id',
+                         'encoded_delivery_zone', 'encoded_sku', 'delivery_year',
+                         'delivery_month', 'delivery_day', 'total_purchased_per_shop',
+                         'purchase_average_by_delivery_date',
+                         'purchase_average_by_delivery_date_sku',
+                         'purchase_average_by_delivery_date_sku_shop_id', 'purchased_og']
+        training_features = self.df[feature_names]
+        X_train, X_test, y_train, y_test = train_test_split(training_features, outcome_label,
+                                                            test_size=0.33,
+                                                            random_state=42)
+        self.__linerRegression(X_train, X_test, y_train, y_test)
+        # except Exception as e:
+        #     self.logger.error('error occur while running pipeline::' + str(e))
+
+    def __linerRegression(self, X_train, X_test, y_train, y_test):
+        lm = LinearRegression()
+        lm.fit(X_train, y_train)
+
+        pred_train = lm.predict(X_train)
+        pred_test = lm.predict(X_test)
+
+        print('Accuracy:', lm.score(X_test, y_test))
+        # print('Classification Stats:')
+        # print(classification_report(y_test, pred))
 
     def __cleanup_column_names(self, rename_dict={}, do_inplace=True):
         """This function renames columns of a pandas dataframe
