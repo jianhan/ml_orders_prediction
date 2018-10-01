@@ -177,20 +177,33 @@ class OrdersPrediction:
         X_train, X_test, y_train, y_test = train_test_split(training_features, outcome_label,
                                                             test_size=0.33,
                                                             random_state=42)
-        sc = StandardScaler()
-        X_train_std = sc.fit_transform(X_train)
-        X_test_std = sc.transform(X_test)
-        self.__linerRegression(X_train_std, X_test_std, y_train, y_test)
-        self.__lasso(X_train_std, X_test_std, y_train, y_test)
-        self.__bayesian_ridge_regression(X_train_std, X_test_std, y_train, y_test)
+        ss = StandardScaler()
+        X_train_std = ss.fit_transform(X_train)
+        X_test_std = ss.transform(X_test)
+
+        model = self.__linerRegression(X_train_std, X_test_std, y_train, y_test)
+
+        # self.__lasso(X_train_std, X_test_std, y_train, y_test)
+        # self.__bayesian_ridge_regression(X_train_std, X_test_std, y_train, y_test)
+
+        import os
+        from sklearn.externals import joblib
+        if not os.path.exists('Model'):
+            os.mkdir('Model')
+        if not os.path.exists('Scaler'):
+            os.mkdir('Scaler')
+        joblib.dump(model, r'Model/model.pickle')
+        joblib.dump(ss, r'Scaler/scaler.pickle')
+
         # except Exception as e:
         # except Exception as e:
         #     self.logger.error('error occur while running pipeline::' + str(e))
 
     def __linerRegression(self, X_train, X_test, y_train, y_test):
         lm = LinearRegression()
-        lm.fit(X_train, y_train)
+        model = lm.fit(X_train, y_train)
         print('Liner Regression Accuracy:', lm.score(X_test, y_test))
+        return model
 
     def __lasso(self, X_train, X_test, y_train, y_test):
         lm = Lasso(alpha=0.1)
