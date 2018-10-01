@@ -90,7 +90,7 @@ class OrdersPrediction:
         plt.show()
 
     def __featureEngineering(self):
-        pass
+        self.df['id'] = self.df['shop_id'] + self.df['encoded_delivery_zone'] + self.df['encoded_sku']
 
     def __modelBuilding(self):
         pass
@@ -103,7 +103,8 @@ class OrdersPrediction:
         try:
             self.__dataCollection()
             self.__dataWrangling()
-            self.__dataVisualization()
+            # self.__dataVisualization()
+            self.__featureEngineering()
         except Exception as e:
             self.logger.error('error occur while running pipeline' + str(e))
 
